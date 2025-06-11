@@ -29,7 +29,7 @@ pub fn encode(input: &[u8], ecl: ECL, mode: Mode, version: Version) -> CompactQR
         Mode::Numeric => encode_numeric(&mut compact, input, cci_bits),
         Mode::Alphanumeric => encode_alphanumeric(&mut compact, input, cci_bits),
         Mode::Byte => encode_byte(&mut compact, input, cci_bits),
-    };
+    }
 
     let data_bits = hardcode::data_bits(version, ecl);
 

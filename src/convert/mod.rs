@@ -15,6 +15,7 @@ pub mod image;
 use image::ImageError;
 
 use crate::Module;
+use std::fmt::Write as _;
 
 /// Converts a position to a module svg
 /// # Example
@@ -249,12 +250,13 @@ impl From<ImageError> for ConvertError {
 pub fn rgba2hex(color: [u8; 4]) -> String {
     let mut hex = String::with_capacity(9);
 
-    hex.push('#');
-    hex.push_str(&format!("{:02x}", color[0]));
-    hex.push_str(&format!("{:02x}", color[1]));
-    hex.push_str(&format!("{:02x}", color[2]));
+    let _ = write!(
+        &mut hex,
+        "#{:02x}{:02x}{:02x}",
+        color[0], color[1], color[2]
+    );
     if color[3] != 255 {
-        hex.push_str(&format!("{:02x}", color[3]));
+        let _ = write!(&mut hex, "{:02x}", color[3]);
     }
 
     hex
@@ -342,4 +344,17 @@ pub trait Builder {
     fn image_gap(&mut self, gap: f64) -> &mut Self;
     /// Updates the image position, anchor is the center of the image. Default is the center of the [`crate::QRCode`]
     fn image_position(&mut self, x: f64, y: f64) -> &mut Self;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn encode_rgba2hex() {
+        assert_eq!(&rgba2hex([0, 0, 0, 255]), "#000000");
+        assert_eq!(&rgba2hex([255, 255, 255, 255]), "#ffffff");
+        assert_eq!(&rgba2hex([0, 255, 0, 255]), "#00ff00");
+        assert_eq!(&rgba2hex([67, 255, 100, 217]), "#43ff64d9");
+    }
 }
